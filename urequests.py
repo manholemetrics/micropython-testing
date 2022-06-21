@@ -1,4 +1,4 @@
-import socket as usocket
+import usocket as usocket
 import time
 
 
@@ -55,14 +55,18 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
 
     ai = usocket.getaddrinfo(host, port, 0, usocket.SOCK_STREAM)
     ai = ai[0]
-    print("tets")
+    #print("tets")
     s = usocket.socket(ai[0], ai[1], ai[2])
     s.settimeout(10)
+    print("Making Connection")
     try:
         s.connect(ai[-1])
+        print("Connected")
         if proto == "https:":
             s = ussl.wrap_socket(s, server_hostname=host)
+            print("Wrapped SSL")
         s.write(b"%s /%s HTTP/1.0\r\n" % (method, path))
+        print("Written Header")
         if not "Host" in headers:
             s.write(b"Host: %s\r\n" % host)
         # Iterate over keys to avoid tuple alloc
@@ -71,6 +75,7 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
             s.write(b": ")
             s.write(headers[k])
             s.write(b"\r\n")
+        print("Constructing Data")
         if json is not None:
             assert data is None
             import ujson
@@ -84,6 +89,7 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
         print(data)
         if data:
             s.write(data)
+            print("Written Data")
         l = s.readline()
         # print(l)
         l = l.split(None, 2)
@@ -94,8 +100,8 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
         print(time.time())
         start_time = int(time.time())
         while True:
-            print(start_time)
-            print("start",int(time.time()))
+            #print(start_time)
+            #print("start",int(time.time()))
             if int(time.time()) - start_time > 10:
                 print("time out")
                 raise Exception() 
@@ -105,6 +111,7 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
             # print(l)
             if l.startswith(b"Transfer-Encoding:"):
                 if b"chunked" in l:
+                    print("Bad response")
                     raise ValueError("Unsupported " + l)
             elif l.startswith(b"Location:") and not 200 <= status <= 299:
                 raise NotImplementedError("Redirects not yet supported")

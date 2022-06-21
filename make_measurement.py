@@ -5,13 +5,14 @@ import machine
 from machine import Pin
 
 # initialise Ultrasonic Sensor pins
-echo = Pin("P11", mode=Pin.IN) # Lopy4 specific: Pin('P20', mode=Pin.IN)
-trigger = Pin("P12", mode=Pin.OUT) # Lopy4 specific Pin('P21', mode=Pin.IN)
+echo = Pin("P19", mode=Pin.IN) # Lopy4 specific: Pin('P20', mode=Pin.IN)
+trigger = Pin("P20", mode=Pin.OUT) # Lopy4 specific Pin('P21', mode=Pin.IN)
 trigger(0)
 
 # Ultrasonic distance measurment
 def distance_measure():
     # trigger pulse LOW for 2us (just in case)
+    utime.sleep_ms(50)
     trigger.value(0)
     utime.sleep_us(5)
     # trigger HIGH for a 10us pulse
@@ -38,7 +39,7 @@ def distance_measure():
     finish = utime.ticks_us()
 
     # pause for 20ms to prevent overlapping echos
-    utime.sleep_ms(20)
+    utime.sleep_ms(50)
 
     # calculate distance by using time difference between start and stop
     # speed of sound 340m/s or .034cm/us. Time * .034cm/us = Distance sound travelled there and back
